@@ -8,35 +8,22 @@ on:
 
 jobs:
   build:
-    name: Build on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+    # We still need to specify a GitHub-hosted runner,
+    # but we'll run everything inside a Debian container.
+    runs-on: ubuntu-latest
+
+    container:
+      image: debian:stable-slim # or debian:latest, debian:bookworm, etc.
 
     steps:
       # 1) Check out the code
       - uses: actions/checkout@v3
 
-      # 2) Install dependencies per OS
-      - name: Install dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      # 2) Install dependencies (inside the Debian container)
+      - name: Install dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential cmake libgl1-mesa-dev xorg-dev
-
-      - name: Install dependencies (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          brew update
-          brew install cmake
-
-      - name: Install dependencies (Windows)
-        if: matrix.os == 'windows-latest'
-        run: |
-          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=1' --yes
-          # Windows typically includes OpenGL headers by default.
+          apt-get update
+          apt-get install -y build-essential cmake libgl1-mesa-dev xorg-dev
 
       # 3) Configure and build using CMake
       - name: Configure and build
@@ -46,7 +33,7 @@ jobs:
           cmake -DCMAKE_BUILD_TYPE=Release ..
           cmake --build . --config Release
 
-      # 4) (Optional) Run tests
+      # 4) (Optional) Run tests, if you have them
       # - name: Run tests
       #   run: |
       #     cd build
