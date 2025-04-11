@@ -1,50 +1,61 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.14)  # Needed for FetchContent
 project(ModernGLProject LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# ------------------------------------------------------------------------
+# 1) Find OpenGL from the system (Mesa or equivalent).
+#    If this fails, the user must install an OpenGL dev package manually.
+# ------------------------------------------------------------------------
 find_package(OpenGL REQUIRED)
 
+# ------------------------------------------------------------------------
+# 2) Use FetchContent to automatically download/build third-party libs
+#    (GLFW, GLAD, GLM) if not found on the system.
+# ------------------------------------------------------------------------
 include(FetchContent)
 
 #
-# GLM
+# 2a) GLM
 #
 FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
-  GIT_TAG 0.9.9.8
+  GIT_TAG 0.9.9.8           # or a newer release tag
 )
 set(GLM_TEST_ENABLE OFF CACHE BOOL "Disable GLM unit tests" FORCE)
 FetchContent_MakeAvailable(glm)
 
 #
-# GLFW
+# 2b) GLFW
 #
 FetchContent_Declare(
   glfw
   GIT_REPOSITORY https://github.com/glfw/glfw.git
-  GIT_TAG 3.3.8
+  GIT_TAG 3.3.8             # pick a known stable release
 )
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "GLFW Docs" FORCE)
+set(GLFW_BUILD_DOCS     OFF CACHE BOOL "GLFW Docs" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "GLFW Examples" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "GLFW Tests" FORCE)
+set(GLFW_BUILD_TESTS    OFF CACHE BOOL "GLFW Tests" FORCE)
 FetchContent_MakeAvailable(glfw)
 
 #
-# GLAD
+# 2c) GLAD
 #
 FetchContent_Declare(
   glad
   GIT_REPOSITORY https://github.com/Dav1dde/glad.git
-  GIT_TAG v0.1.36
+  GIT_TAG v0.1.36          # or a newer release
 )
 set(GLAD_PROFILE "core" CACHE STRING "OpenGL profile")
-set(GLAD_API "gl=3.3" CACHE STRING "OpenGL version")
+set(GLAD_API "gl=3.3"  CACHE STRING "OpenGL version")
 set(GLAD_GENERATOR "c" CACHE STRING "Language for GLAD")
 FetchContent_MakeAvailable(glad)
 
+# ------------------------------------------------------------------------
+# 3) Now create our main project
+# ------------------------------------------------------------------------
 file(GLOB SRC_FILES
     "${PROJECT_SOURCE_DIR}/src/*.cpp"
 )
@@ -56,10 +67,13 @@ target_include_directories(${PROJECT_NAME}
         ${PROJECT_SOURCE_DIR}/include
 )
 
-**target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
     PRIVATE
-        OpenGL::GL
-        glfw
-        glad
-        glm::glm
-)**
+        OpenGL::GL      # Provided by find_package(OpenGL)
+        glfw            # Provided by FetchContent for GLFW
+        glad            # Provided by FetchContent for GLAD
+        glm::glm        # <-- Add GLM here so #include <glm/glm.hpp> works
+)
+
+# On some Linux distros, you may also need X11, pthread, dl, etc.:
+# target_link_libraries(${PROJECT_NAME} PRIVATE X11 pthread dl)
