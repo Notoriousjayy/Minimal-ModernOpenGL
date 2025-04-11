@@ -44,7 +44,8 @@ jobs:
         run: |
           mkdir build
           cd build
-          # Use Release (optimized) build; remove the problematic policy version arg
+          # Make sure we do a Release (optimized) build
+          # NOTE: The important addition here is the -DCMAKE_POLICY_VERSION_MINIMUM=3.5 flag
           cmake -DCMAKE_BUILD_TYPE=Release ..
           cmake --build . --config Release
 
