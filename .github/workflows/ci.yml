@@ -36,7 +36,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           choco install cmake --installargs 'ADD_CMAKE_TO_PATH=1' --yes
-          # Windows includes OpenGL headers by default; typically no extra package needed.
+          # Windows typically includes OpenGL headers by default.
           # If you need MSVC or MinGW, ensure the runner uses the correct environment.
 
       # 3) Configure and build using CMake
@@ -44,6 +44,7 @@ jobs:
         run: |
           mkdir build
           cd build
+          # Make sure we do a Release (optimized) build
           cmake -DCMAKE_BUILD_TYPE=Release ..
           cmake --build . --config Release
 

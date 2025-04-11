@@ -1,22 +1,23 @@
 #!/usr/bin/env bash
 #
-# build_and_run.sh
+# install_dependencies.sh
 #
-# 1) Checks if essential packages for building modern OpenGL apps are installed.
-#    If not, installs them via apt on Debian/Ubuntu (including WSL).
-# 2) Builds the CMake project in a "build" folder.
-# 3) Runs the resulting executable.
+# Checks if essential packages for building modern OpenGL apps are installed.
+# If not, installs them via apt on Debian/Ubuntu (including WSL).
+#
+# Usage: ./install_dependencies.sh
+#
 
 set -Eeuo pipefail
 
-# ------------------------------
+# ------------------------------------------------------------------------------
 # 1) INSTALL DEPENDENCIES
-# ------------------------------
+# ------------------------------------------------------------------------------
 # List of required packages for building/running a modern OpenGL + CMake project:
 #   - build-essential: Provides gcc/g++, make, etc.
-#   - cmake: For configuring/building projects.
-#   - libgl1-mesa-dev: Mesa OpenGL development libraries (includes libGL.so).
-#   - xorg-dev: Provides GLX headers (GL/glx.h) and other X dev libraries.
+#   - cmake: For configuring/building projects
+#   - libgl1-mesa-dev: Mesa OpenGL development libraries (includes libGL.so)
+#   - xorg-dev: Provides GLX headers (GL/glx.h) and other X dev libraries
 #
 # Add more (e.g., libglu-dev, git) if your project needs them.
 REQUIRED_PKGS=(
@@ -28,6 +29,7 @@ REQUIRED_PKGS=(
 
 echo "Checking for required packages..."
 
+# Collect any packages that are missing
 MISSING=()
 
 for pkg in "${REQUIRED_PKGS[@]}"; do
@@ -36,6 +38,7 @@ for pkg in "${REQUIRED_PKGS[@]}"; do
   fi
 done
 
+# If any are missing, install them
 if [ ${#MISSING[@]} -eq 0 ]; then
   echo "All required packages are already installed."
 else
@@ -45,32 +48,3 @@ else
 fi
 
 echo "Dependency installation check complete."
-
-# ------------------------------
-# 2) BUILD THE CMAKE PROJECT
-# ------------------------------
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd "$SCRIPT_DIR"
-
-BUILD_DIR="build"
-EXECUTABLE_NAME="ModernGLProject"  # <-- Change if your exe name differs
-
-mkdir -p "$BUILD_DIR"
-cd "$BUILD_DIR"
-
-echo "Configuring project with CMake..."
-cmake ..
-
-echo "Building project..."
-make -j$(nproc)  # Parallel build for speed; remove -j if you prefer serial
-
-# ------------------------------
-# 3) RUN THE PROGRAM
-# ------------------------------
-if [ -f "./$EXECUTABLE_NAME" ]; then
-  echo "Running $EXECUTABLE_NAME..."
-  "./$EXECUTABLE_NAME"
-else
-  echo "Error: $EXECUTABLE_NAME not found in build folder."
-  exit 1
-fi
