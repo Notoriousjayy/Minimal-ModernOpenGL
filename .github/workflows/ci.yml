@@ -19,36 +19,41 @@ jobs:
       # 1) Check out the code
       - uses: actions/checkout@v3
 
-      # 2) Install dependencies per OS
+      # 2) Use a modern CMake (3.25, for example)
+      - name: Setup CMake
+        uses: actions/setup-cmake@v3
+        with:
+          cmake-version: "3.25.0"
+
+      # 3) Install other dependencies per OS
       - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake libgl1-mesa-dev xorg-dev
+          sudo apt-get install -y build-essential libgl1-mesa-dev xorg-dev
 
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
         run: |
           brew update
-          brew install cmake
+          # brew install cmake  # No longer needed since we used setup-cmake
+          # Add other packages if needed
 
       - name: Install dependencies (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          choco install cmake --installargs 'ADD_CMAKE_TO_PATH=1' --yes
-          # Windows typically includes OpenGL headers by default.
-          # If you need MSVC or MinGW, ensure the runner uses the correct environment.
+          # choco install cmake --installargs 'ADD_CMAKE_TO_PATH=1' --yes # Not needed with setup-cmake
+          echo "Install additional Win deps here if needed"
 
-      # 3) Configure and build using CMake
+      # 4) Configure and build
       - name: Configure and build
         run: |
           mkdir build
           cd build
-          # Make sure we do a Release (optimized) build
           cmake -DCMAKE_BUILD_TYPE=Release ..
           cmake --build . --config Release
 
-      # 4) (Optional) Run tests, if you have them
+      # 5) (Optional) Run tests
       # - name: Run tests
       #   run: |
       #     cd build
