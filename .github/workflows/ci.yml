@@ -37,19 +37,16 @@ jobs:
         run: |
           choco install cmake --installargs 'ADD_CMAKE_TO_PATH=1' --yes
           # Windows typically includes OpenGL headers by default.
-          # If you need MSVC or MinGW, ensure the runner uses the correct environment.
 
       # 3) Configure and build using CMake
       - name: Configure and build
         run: |
           mkdir build
           cd build
-          # Make sure we do a Release (optimized) build
-          # NOTE: The important addition here is the -DCMAKE_POLICY_VERSION_MINIMUM=3.5 flag
           cmake -DCMAKE_BUILD_TYPE=Release ..
           cmake --build . --config Release
 
-      # 4) (Optional) Run tests, if you have them
+      # 4) (Optional) Run tests
       # - name: Run tests
       #   run: |
       #     cd build
