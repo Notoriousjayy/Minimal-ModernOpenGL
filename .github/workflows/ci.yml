@@ -19,8 +19,16 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          # Include 'git' so that FetchContent can do its clones
-          apt-get install -y git build-essential cmake libgl1-mesa-dev xorg-dev python3
+          # Install essential packages, plus those for gnuplot + GSL
+          apt-get install -y \
+            git \
+            build-essential \
+            cmake \
+            libgl1-mesa-dev \
+            xorg-dev \
+            python3 \
+            gnuplot \
+            libgsl-dev
 
       - name: Configure and build
         run: |

@@ -18,13 +18,17 @@ set -Eeuo pipefail
 #   - cmake: For configuring/building projects
 #   - libgl1-mesa-dev: Mesa OpenGL development libraries (includes libGL.so)
 #   - xorg-dev: Provides GLX headers (GL/glx.h) and other X dev libraries
+#   - gnuplot: Command-line plotting utility
+#   - libgsl-dev: GNU Scientific Library (headers/libs for GSL)
 #
-# Add more (e.g., libglu-dev, git) if your project needs them.
+# Add more packages (e.g., libglu-dev, python3, git) if your project needs them.
 REQUIRED_PKGS=(
   build-essential
   cmake
   libgl1-mesa-dev
   xorg-dev
+  gnuplot
+  libgsl-dev
 )
 
 echo "Checking for required packages..."
