@@ -20,7 +20,7 @@ jobs:
         run: |
           apt-get update
           # Include 'git' so that FetchContent can do its clones
-          apt-get install -y git build-essential cmake libgl1-mesa-dev xorg-dev
+          apt-get install -y git build-essential cmake libgl1-mesa-dev xorg-dev python3
 
       - name: Configure and build
         run: |
