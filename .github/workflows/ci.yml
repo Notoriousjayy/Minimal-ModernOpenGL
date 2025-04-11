@@ -8,28 +8,31 @@ on:
 
 jobs:
   build:
-    # We still need to specify a GitHub-hosted runner,
-    # but we'll run everything inside a Debian container.
-    runs-on: ubuntu-latest
-
-    container:
-      image: debian:stable-slim # or debian:latest, debian:bookworm, etc.
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
 
     steps:
       # 1) Check out the code
       - uses: actions/checkout@v3
 
-      # 2) Install dependencies (inside the Debian container)
-      - name: Install dependencies
+      # 2) Install dependencies per OS
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: |
-          apt-get update
-          apt-get install -y build-essential cmake libgl1-mesa-dev xorg-dev
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libgl1-mesa-dev xorg-dev
 
       # 3) Configure and build using CMake
       - name: Configure and build
         run: |
           mkdir build
           cd build
+          # Make sure we do a Release (optimized) build
+          # NOTE: The important addition here is the -DCMAKE_POLICY_VERSION_MINIMUM=3.5 flag
           cmake -DCMAKE_BUILD_TYPE=Release ..
           cmake --build . --config Release
 
